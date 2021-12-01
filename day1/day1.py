@@ -12,8 +12,8 @@ import advent_tools
 
 
 def main():
-    advent_tools.TESTING = True
-    # data = advent_tools.read_all_integers()
+    # advent_tools.TESTING = True
+    data = advent_tools.read_all_integers()
     # data = advent_tools.read_whole_input()
     # data = advent_tools.read_input_lines()
     # data = advent_tools.read_input_line_groups("\n\n")
@@ -29,16 +29,20 @@ def main():
 
 
 def process_input(data):
-    print(data)
+    data = pd.Series(q[0] for q in data)
     return data
 
 
 def run_part_1(data):
+    d = data.diff()
+    return sum(d>0)
     pass
 
 
 def run_part_2(data):
-    pass
+    s = data.rolling(3).sum()
+    d = s.diff()
+    return sum(d > 0)
 
 
 if __name__ == '__main__':
