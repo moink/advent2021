@@ -11,10 +11,10 @@ def main():
 def process_input(data):
     result = []
     for line in data:
-        direction, str_step = line.split()
-        step = int(str_step)
-        result.append((direction, step))
+        direction, step = line.split()
+        result.append((direction, (int(step))))
     return result
+
 
 def run_part_1(data):
     depth = 0
