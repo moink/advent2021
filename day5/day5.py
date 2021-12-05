@@ -9,28 +9,28 @@ def main():
 
 
 def run_part_1(data):
-    grid = np.zeros((1000, 1000))
-    for x0, y0, x1, y1 in data:
-        if x0 == x1:
-            grid[x0, min(y0, y1):max(y0, y1) + 1] += 1
-        if y0 == y1:
-            grid[min(x0, x1):max(x0, x1) + 1, y0] += 1
-    return (grid >= 2).sum().sum()
+    return get_intersection_count(data, False)
 
 
 def run_part_2(data):
+    return get_intersection_count(data, True)
+
+
+def get_intersection_count(data, consider_diag):
     grid = np.zeros((1000, 1000))
     for x0, y0, x1, y1 in data:
         if x0 == x1:
-            grid[x0, min(y0, y1):max(y0, y1) + 1] += 1
+            grid[x0, get_range(y0, y1)] += 1
         elif y0 == y1:
-            grid[min(x0, x1):max(x0, x1) + 1, y0] += 1
-        else:
-            xrange = list(range(x0, x1 + 1)) or list(range(x0, x1 - 1, -1))
-            yrange = list(range(y0, y1 + 1)) or list(range(y0, y1 - 1, -1))
-            for x, y in zip(xrange, yrange):
+            grid[get_range(x0, x1), y0] += 1
+        elif consider_diag:
+            for x, y in zip(get_range(x0, x1), get_range(y0, y1)):
                 grid[x, y] += 1
     return (grid >= 2).sum().sum()
+
+
+def get_range(x0, x1):
+    return list(range(x0, x1 + 1)) or list(range(x0, x1 - 1, -1))
 
 
 if __name__ == '__main__':
