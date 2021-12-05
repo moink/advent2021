@@ -30,7 +30,7 @@ def get_intersection_count(data, consider_diag):
 
 
 def get_range(x0, x1):
-    return list(range(x0, x1 + 1)) or list(range(x0, x1 - 1, -1))
+    return range(x0, x1 + 1) or range(x0, x1 - 1, -1)
 
 
 if __name__ == '__main__':
