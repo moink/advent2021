@@ -16,8 +16,7 @@ def process_input(data):
     drawing = [int(num) for num in data[0][0].split(",")]
     boards = []
     for grid in data[1:]:
-        temp = StringIO("\n".join(grid))
-        boards.append(np.loadtxt(temp, dtype=int))
+        boards.append(np.loadtxt(StringIO("\n".join(grid)), dtype=int))
     return drawing, boards
 
 
@@ -31,9 +30,7 @@ def is_winner(drawn):
 
 
 def score_board(board, drawn, cur_draw):
-    not_called = board * (1 - drawn)
-    sum = not_called.sum().sum()
-    return sum * cur_draw
+    return (board * (1 - drawn)).sum().sum() * cur_draw
 
 
 def run_part_1(drawing, boards):
@@ -47,10 +44,11 @@ def run_part_1(drawing, boards):
 
 
 def run_part_2(drawing, boards):
-    drawn = [np.zeros_like(boards[0])] * len(boards)
-    no_win_yet = set(range(len(boards)))
+    num_boards = len(boards)
+    drawn = [np.zeros_like(boards[0])] * num_boards
+    no_win_yet = set(range(num_boards))
     for cur_draw in drawing:
-        for board_num in range(len(boards)):
+        for board_num in range(num_boards):
             if board_num in no_win_yet:
                 drawn[board_num] = drawn[board_num] | (boards[board_num] == cur_draw)
                 if is_winner(drawn[board_num]):
