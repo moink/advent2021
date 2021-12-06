@@ -12,8 +12,8 @@ def main():
 def run_simulation(data, n_steps):
     counts = collections.Counter(data)
     for _ in range(n_steps):
+        zero_count = counts.pop(0, 0)
         new_counts = collections.defaultdict(int, {n - 1: c for n, c in counts.items()})
-        zero_count = new_counts.pop(-1, 0)
         new_counts[6] = new_counts[6] + zero_count
         new_counts[8] = zero_count
         counts = new_counts
