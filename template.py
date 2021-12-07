@@ -4,9 +4,12 @@ import copy
 import functools
 import itertools
 import math
+import re
+import statistics
+
 import numpy as np
 import pandas as pd
-import re
+from matplotlib import pyplot as plt
 
 import advent_tools
 
