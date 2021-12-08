@@ -1,5 +1,3 @@
-from functools import partial
-
 import advent_tools
 
 
@@ -20,42 +18,44 @@ def run_part_2(data):
 
 def get_rhs_digits(line):
     left, right = line.split("|")
+    number_rules = (
+        ("1", 2, None, None),
+        ("4", 4, None, None),
+        ("7", 3, None, None),
+        ("8", 7, None, None),
+        ("3", 5, "1", None),
+        ("9", 6, "4", None),
+        ("0", 6, "1", None),
+        ("6", 6, None, None),
+        ("5", 5, None, "6"),
+        ("2", 5, None, None),
+    )
     not_found_yet = {"".join(sorted(word)) for word in left.split()}
-    numbers_to_letters = {
-        "1": get_that_matches(not_found_yet, 2),
-        "4": get_that_matches(not_found_yet, 4),
-        "7": get_that_matches(not_found_yet, 3),
-        "8": get_that_matches(not_found_yet, 7),
-    }
-    numbers_to_letters["3"] = get_that_matches(
-        not_found_yet, 5, partial(is_super_set, subset=numbers_to_letters["1"])
-    )
-    numbers_to_letters["9"] = get_that_matches(
-        not_found_yet, 6, partial(is_super_set, subset=numbers_to_letters["4"])
-    )
-    numbers_to_letters["0"] = get_that_matches(
-        not_found_yet, 6, partial(is_super_set, subset=numbers_to_letters["1"])
-    )
-    numbers_to_letters["6"] = get_that_matches(not_found_yet, 6)
-    numbers_to_letters["5"] = get_that_matches(
-        not_found_yet, 5, lambda x: is_super_set(numbers_to_letters["6"], x)
-    )
-    numbers_to_letters["2"] = get_that_matches(not_found_yet, 5)
+    numbers_to_letters = {}
+    for digit, length, subset_digit, superset_digit in number_rules:
+        numbers_to_letters[digit] = get_digit(
+            not_found_yet,
+            length,
+            numbers_to_letters.get(subset_digit, None),
+            numbers_to_letters.get(superset_digit, None))
     letters_to_numbers = {val: key for key, val in numbers_to_letters.items()}
     return [letters_to_numbers["".join(sorted(word))] for word in right.split()]
 
 
-def get_that_matches(not_found_yet, length, fun=None):
-    if fun is None:
-        fun = lambda x: True
-    for val in not_found_yet:
-        if len(val) == length and fun(val):
-            not_found_yet.remove(val)
-            return val
-    raise RuntimeError("No matching value")
+def get_digit(not_found_yet, length, subset, superset):
 
-def is_super_set(superset, subset):
-    return set(subset).issubset(superset)
+    def filter_digit(x):
+        if subset is None and superset is None:
+            return len(x) == length
+        if superset is None:
+            return len(x) == length and set(subset).issubset(x)
+        return len(x) == length and set(x).issubset(superset)
+
+    for letters in not_found_yet:
+        if filter_digit(letters):
+            not_found_yet.remove(letters)
+            return letters
+
 
 
 if __name__ == '__main__':
