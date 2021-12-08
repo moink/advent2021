@@ -47,11 +47,13 @@ def get_rhs(line):
 def get_digit(not_found_yet, length, subset, superset):
 
     def filter_digit(candidate):
-        if subset is None and superset is None:
-            return len(candidate) == length
-        if superset is None:
-            return len(candidate) == length and set(subset).issubset(candidate)
-        return len(candidate) == length and set(candidate).issubset(superset)
+        if len(candidate) != length:
+            return False
+        if subset is not None:
+            return set(subset).issubset(candidate)
+        if superset is not None:
+            return set(candidate).issubset(superset)
+        return True
 
     for letters in not_found_yet:
         if filter_digit(letters):
