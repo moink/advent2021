@@ -1,5 +1,19 @@
 import advent_tools
 
+DIGIT_RULES = (
+    # Digit, number of segments, subset digit, superset digit
+    ("1", 2, None, None),
+    ("4", 4, None, None),
+    ("7", 3, None, None),
+    ("8", 7, None, None),
+    ("3", 5, "1", None),
+    ("9", 6, "4", None),
+    ("0", 6, "1", None),
+    ("6", 6, None, None),
+    ("5", 5, None, "6"),
+    ("2", 5, None, None),
+)
+
 
 def main():
     data = [get_rhs_digits(line) for line in advent_tools.read_input_lines()]
@@ -18,21 +32,9 @@ def run_part_2(data):
 
 def get_rhs_digits(line):
     left, right = line.split("|")
-    number_rules = (
-        ("1", 2, None, None),
-        ("4", 4, None, None),
-        ("7", 3, None, None),
-        ("8", 7, None, None),
-        ("3", 5, "1", None),
-        ("9", 6, "4", None),
-        ("0", 6, "1", None),
-        ("6", 6, None, None),
-        ("5", 5, None, "6"),
-        ("2", 5, None, None),
-    )
     not_found_yet = {"".join(sorted(word)) for word in left.split()}
     numbers_to_letters = {}
-    for digit, length, subset_digit, superset_digit in number_rules:
+    for digit, length, subset_digit, superset_digit in DIGIT_RULES:
         numbers_to_letters[digit] = get_digit(
             not_found_yet,
             length,
@@ -44,18 +46,20 @@ def get_rhs_digits(line):
 
 def get_digit(not_found_yet, length, subset, superset):
 
-    def filter_digit(x):
+    def filter_digit(candidate):
         if subset is None and superset is None:
-            return len(x) == length
+            return len(candidate) == length
         if superset is None:
-            return len(x) == length and set(subset).issubset(x)
-        return len(x) == length and set(x).issubset(superset)
+            return len(candidate) == length and set(subset).issubset(candidate)
+        return len(candidate) == length and set(candidate).issubset(superset)
 
     for letters in not_found_yet:
         if filter_digit(letters):
             not_found_yet.remove(letters)
             return letters
-
+    raise RuntimeError(
+        f"No letters with length {length}, subset {subset} and superset {superset}"
+        f" in {not_found_yet}")
 
 
 if __name__ == '__main__':
