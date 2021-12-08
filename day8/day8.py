@@ -16,21 +16,21 @@ DIGIT_RULES = (
 
 
 def main():
-    data = [get_rhs_digits(line) for line in advent_tools.read_input_lines()]
+    data = [get_rhs(line) for line in advent_tools.read_input_lines()]
     print('Part 1:', run_part_1(data))
     print('Part 2:', run_part_2(data))
 
 
 def run_part_1(data):
-    return sum(sum(digits.count(num) for num in ["1", "4", "7", "8"])
-               for digits in data)
+    return sum(sum(numbers.count(digit) for digit in ["1", "4", "7", "8"])
+               for numbers in data)
 
 
 def run_part_2(data):
-    return sum(int("".join(digits)) for digits in data)
+    return sum(int(numbers) for numbers in data)
 
 
-def get_rhs_digits(line):
+def get_rhs(line):
     left, right = line.split("|")
     not_found_yet = {"".join(sorted(word)) for word in left.split()}
     numbers_to_letters = {}
@@ -41,7 +41,7 @@ def get_rhs_digits(line):
             numbers_to_letters.get(subset_digit, None),
             numbers_to_letters.get(superset_digit, None))
     letters_to_numbers = {val: key for key, val in numbers_to_letters.items()}
-    return [letters_to_numbers["".join(sorted(word))] for word in right.split()]
+    return "".join(letters_to_numbers["".join(sorted(word))] for word in right.split())
 
 
 def get_digit(not_found_yet, length, subset, superset):
