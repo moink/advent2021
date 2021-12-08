@@ -25,5 +25,6 @@ def run_part_2(data):
 def get_fuel(dist):
     return dist * (dist + 1) // 2
 
+
 if __name__ == '__main__':
     main()
