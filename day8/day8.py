@@ -59,7 +59,8 @@ def get_digit(not_found_yet, length, subset, superset):
             return letters
     raise RuntimeError(
         f"No letters with length {length}, subset {subset} and superset {superset}"
-        f" in {not_found_yet}")
+        f" in {not_found_yet}"
+    )
 
 
 if __name__ == '__main__':
