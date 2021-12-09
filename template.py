@@ -25,6 +25,7 @@ def main():
     # data = advent_tools.read_one_int_per_line()
     # data = advent_tools.PlottingGrid.from_file({'.' : 0, '#' : 1})
     # data = advent_tools.read_input_line_groups()
+    # data = advent_tools.read_nparray_from_digits()
     data = process_input(data)
     print('Part 1:', run_part_1(data))
     print('Part 2:', run_part_2(data))

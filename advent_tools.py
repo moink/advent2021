@@ -226,7 +226,7 @@ def read_dict_of_list_from_file(sep=' => ', key='left'):
             result: {str: [str]}
                 Dictionary version of today's input.txt, with the value from
                 each line in the list with that key
-        """
+    """
     result = collections.defaultdict(list)
     lines = read_input_lines()
     for line in lines:
@@ -237,6 +237,21 @@ def read_dict_of_list_from_file(sep=' => ', key='left'):
             result[right.strip()].append(left.strip())
     return dict(result)
 
+
+def read_nparray_from_digits():
+    """Read today's input.txt as a numpy array of digits
+
+    Returns:
+        result: np.ndarray
+            Numpy n-d array version of today's input file, where each digit is
+            considered a separate entry in the array
+    """
+    data = read_input_lines()
+    result = np.zeros((len(data), len(data[0])), dtype=int)
+    for i, line in enumerate(data):
+        for j, char in enumerate(line):
+            result[i, j] = int(char)
+    return result
 
 class PlottingGrid:
     """A tool for maintaining and plotting a grid of numbers

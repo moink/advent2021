@@ -7,19 +7,10 @@ import advent_tools
 
 
 def main():
-    data = advent_tools.read_input_lines()
-    heights = process_input(data)
+    heights = advent_tools.read_nparray_from_digits()
     low_points = find_low_points(heights)
     print('Part 1:', run_part_1(heights, low_points))
     print('Part 2:', run_part_2(heights, low_points))
-
-
-def process_input(data):
-    heights = np.zeros((len(data), len(data[0])), dtype=int)
-    for i, line in enumerate(data):
-        for j, char in enumerate(line):
-            heights[i, j] = int(char)
-    return heights
 
 
 def run_part_1(heights, low_points):
