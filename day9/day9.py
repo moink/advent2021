@@ -8,37 +8,37 @@ import advent_tools
 
 def main():
     data = advent_tools.read_input_lines()
-    data = process_input(data)
-    low_points = find_low_points(data)
-    print('Part 1:', run_part_1(data, low_points))
-    print('Part 2:', run_part_2(data, low_points))
+    heights = process_input(data)
+    low_points = find_low_points(heights)
+    print('Part 1:', run_part_1(heights, low_points))
+    print('Part 2:', run_part_2(heights, low_points))
 
 
 def process_input(data):
-    result = np.zeros((len(data), len(data[0])), dtype=int)
+    heights = np.zeros((len(data), len(data[0])), dtype=int)
     for i, line in enumerate(data):
         for j, char in enumerate(line):
-            result[i, j] = int(char)
-    return result
+            heights[i, j] = int(char)
+    return heights
 
 
-def run_part_1(data, low_points):
-    low_values = data[low_points]
+def run_part_1(heights, low_points):
+    low_values = heights[low_points]
     return sum(low_values) + len(low_values)
 
 
-def find_low_points(data):
-    diff_x = np.diff(data, axis=1)
-    d1 = np.pad(diff_x, ((0, 0), (1, 0)),
-                "constant", constant_values=((0, 0), (-1, 0))) < 0
-    d2 = np.pad(diff_x, ((0, 0), (0, 1)),
-                "constant", constant_values=((0, 0), (0, 1))) > 0
-    diff_y = np.diff(data, axis=0)
-    d3 = np.pad(diff_y, ((1, 0), (0, 0)),
-                "constant", constant_values=((-1, 0), (0, 0))) < 0
-    d4 = np.pad(diff_y, ((0, 1), (0, 0)),
-                "constant", constant_values=((0, 1), (0, 0))) > 0
-    low_points = d1 & d2 & d3 & d4
+def find_low_points(heights):
+    diff_x = np.diff(heights, axis=1)
+    less_than_right = np.pad(diff_x, ((0, 0), (1, 0)),
+                             "constant", constant_values=((0, 0), (-1, 0))) < 0
+    less_than_left = np.pad(diff_x, ((0, 0), (0, 1)),
+                            "constant", constant_values=((0, 0), (0, 1))) > 0
+    diff_y = np.diff(heights, axis=0)
+    less_than_below = np.pad(diff_y, ((1, 0), (0, 0)),
+                             "constant", constant_values=((-1, 0), (0, 0))) < 0
+    less_than_above = np.pad(diff_y, ((0, 1), (0, 0)),
+                             "constant", constant_values=((0, 1), (0, 0))) > 0
+    low_points = less_than_right & less_than_left & less_than_below & less_than_above
     return low_points
 
 
@@ -60,11 +60,10 @@ def get_basin(data, start_x, start_y):
         return (0 < xx < max_x and 0 < yy < max_y and pos not in basin
                 and data[pos] != 9)
 
-    not_evaluated = collections.deque([(start_y, start_x)])
+    not_evaluated = collections.deque(basin)
     while not_evaluated:
         y, x = not_evaluated.pop()
-        to_consider = [(y, x - 1), (y, x + 1), (y - 1, x), (y + 1, x)]
-        for new_pos in to_consider:
+        for new_pos in [(y, x - 1), (y, x + 1), (y - 1, x), (y + 1, x)]:
             if belongs_to_basin(new_pos):
                 basin.add(new_pos)
                 not_evaluated.append(new_pos)
