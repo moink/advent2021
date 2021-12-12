@@ -705,18 +705,17 @@ def find_all_final_states(current_state):
         and is_final
     """
     final_states = set()
-    queue = collections.deque()
+    stack = [current_state]
     discovered = {current_state}
-    queue.append(current_state)
-    while queue:
-        state = queue.popleft()
+    while stack:
+        state = stack.pop()
         new_states = state.possible_next_states()
         for new_state in new_states:
             if new_state.is_final():
                 final_states.add(new_state)
             elif new_state not in discovered:
                 discovered.add(new_state)
-                queue.append(new_state)
+                stack.append(new_state)
     return final_states
 
 
