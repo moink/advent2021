@@ -687,17 +687,17 @@ def find_final_state(current_state):
                 discovered[new_state] = num_steps + 1
                 queue.append(new_state)
 
+
 def find_all_final_states(current_state):
-    """Return the final state found in shortest steps using a BFS search
+    """Return all discoverable final states with a BFS search
 
     Args:
         current_state: StateForGraphs
             The state at the beginning of the search; the root of the tree.
 
     Returns:
-        final_state: StateForGraphs
-            The first state that returns true for its is_final method,
-            when using a breadth-first search
+        final_state: set of StateForGraphs
+            All states reachable from the current state
 
     See Also: StateForGraphs
         to understand the required methods for the states used in the graph.
@@ -706,20 +706,18 @@ def find_all_final_states(current_state):
     """
     final_states = set()
     queue = collections.deque()
-    discovered = {current_state: 0}
+    discovered = {current_state}
     queue.append(current_state)
     while queue:
         state = queue.popleft()
-        num_steps = discovered[state]
         new_states = state.possible_next_states()
         for new_state in new_states:
             if new_state.is_final():
                 final_states.add(new_state)
-            if new_state not in discovered:
-                discovered[new_state] = num_steps + 1
+            elif new_state not in discovered:
+                discovered.add(new_state)
                 queue.append(new_state)
     return final_states
-
 
 
 class Computer(abc.ABC):
@@ -1042,3 +1040,5 @@ if __name__ == '__main__':
     start_coding_today()
     # today = 1
     # start_coding(today)
+
+
