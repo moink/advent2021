@@ -13,7 +13,6 @@ def main():
 
 def run_both_parts(energy):
     new_energy = energy
-    new_flashes = np.zeros_like(energy)
     part1_sol = 0
     flash_count = 0
     convolve_matrix = np.ones((3, 3))
@@ -32,7 +31,7 @@ def run_both_parts(energy):
             flashes = new_flashes
         energy = new_energy
         energy[flashes] = 0
-        flash_count += new_flashes.sum().sum()
+        flash_count += flashes.sum().sum()
         if step == 100:
             part1_sol = flash_count
         if flashes.all().all():
