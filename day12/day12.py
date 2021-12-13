@@ -3,10 +3,7 @@ import time
 
 import advent_tools
 
-
-def main():
-    print('Part 1:', run_part(PartOneMazeState))
-    print('Part 2:', run_part(PartTwoMazeState))
+MAZE = {}
 
 
 def process_input(lines):
@@ -48,11 +45,8 @@ class PartTwoMazeState(PartOneMazeState):
             n for n in self.nodes if n.islower()).values()) > 1
 
     def is_valid(self, next_node):
-        if next_node.isupper():
-            return True
-        if self.lower_twice_visited and next_node in self.nodes:
-            return False
-        return True
+        return (next_node.isupper() or not self.lower_twice_visited
+                or next_node not in self.nodes)
 
 
 def run_part(state_class):
