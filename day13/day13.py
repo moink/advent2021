@@ -5,28 +5,31 @@ import advent_tools
 
 
 def main():
-    data = advent_tools.read_input_line_groups()
-    grid, folds = process_input(data)
+    grid_part, fold_part = advent_tools.read_input_line_groups()
+    grid = make_initial_grid(grid_part)
+    folds = preprocess_folds(fold_part)
     print('Part 1:', run_part_1(grid, folds))
     run_part_2(grid, folds)
 
 
-def process_input(data):
-    max_x = max(int(line.split(",")[0]) for line in data[0])
-    max_y = max(int(line.split(",")[1]) for line in data[0])
+def make_initial_grid(grid_part):
+    max_x = max(int(line.split(",")[0]) for line in grid_part)
+    max_y = max(int(line.split(",")[1]) for line in grid_part)
     grid = np.zeros((max_y + 1, max_x + 1), dtype=bool)
-    for line in data[0]:
+    for line in grid_part:
         x, y = line.split(",")
         grid[int(y), int(x)] = True
+    return grid
+
+
+def preprocess_folds(fold_part):
+    axis_map = {"x": 1, "y": 0}
     folds = []
-    for line in data[1]:
+    for line in fold_part:
         equation = line.split()[-1]
         axis, pos = equation.split("=")
-        if axis == "x":
-            folds.append((1, int(pos)))
-        else:
-            folds.append((0, int(pos)))
-    return grid, folds
+        folds.append((axis_map[axis], int(pos)))
+    return folds
 
 
 def fold_grid(grid, axis, pos):
