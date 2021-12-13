@@ -51,6 +51,7 @@ def run_part_2(grid, folds):
     for axis, pos in folds:
         grid = fold_grid(grid, axis, pos)
     plt.imshow(grid)
+    plt.title("Part 2")
     plt.show()
 
 
