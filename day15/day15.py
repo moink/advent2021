@@ -24,8 +24,7 @@ def run_part_2(data):
 def find_min_path(data):
     big_number = data.sum().sum()
     cost = big_number * np.ones_like(data)
-    max_y, max_x = data.shape
-    cost[max_y - 1, max_x - 1] = data[max_y - 1, max_x - 1]
+    cost[- 1, - 1] = data[- 1, - 1]
     keep_going = True
     while keep_going:
         old_cost = cost
@@ -34,7 +33,7 @@ def find_min_path(data):
         cost = np.minimum(cost, data + shift_with_padding(cost, -1, 1, big_number))
         cost = np.minimum(cost, data + shift_with_padding(cost, 1, 1, big_number))
         keep_going = np.abs(cost - old_cost).any().any()
-    return int(cost[0, 0] - data[0, 0])
+    return cost[0, 0] - data[0, 0]
 
 
 def shift_with_padding(data, shift, axis, pad_value):
