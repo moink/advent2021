@@ -28,15 +28,15 @@ def find_min_path(data):
     keep_going = True
     while keep_going:
         old_cost = cost
-        cost = np.minimum(cost, data + roll_inf_pad(cost, -1, 0))
-        cost = np.minimum(cost, data + roll_inf_pad(cost, 1, 0))
-        cost = np.minimum(cost, data + roll_inf_pad(cost, -1, 1))
-        cost = np.minimum(cost, data + roll_inf_pad(cost, 1, 1))
+        cost = np.minimum(cost, data + shift_padding_with_inf(cost, -1, 0))
+        cost = np.minimum(cost, data + shift_padding_with_inf(cost, 1, 0))
+        cost = np.minimum(cost, data + shift_padding_with_inf(cost, -1, 1))
+        cost = np.minimum(cost, data + shift_padding_with_inf(cost, 1, 1))
         keep_going = np.abs(cost - old_cost).any().any()
     return int(cost[0, 0] - data[0, 0])
 
 
-def roll_inf_pad(data, shift, axis):
+def shift_padding_with_inf(data, shift, axis):
     shifted_data = np.roll(data, shift, axis=axis)
     null_slice = slice(None, None)
     if shift < 0:
