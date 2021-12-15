@@ -964,6 +964,37 @@ def recursive_inside_outside(data, start_char, end_char):
     return {'outside': outside, 'inside': inside_full}
 
 
+def shift_with_padding(data, shift, axis, pad_value):
+    """Shift a 2d numpy array along some axis, padding with a constant to maintain size
+
+    Args:
+        data: np.array_like
+            Input array
+        shift: int
+            The number of places by which elements are shifted
+        axis: int
+            Axis along which elements are shifted
+        pad_value: scalar
+            Value to which to set the padded values
+
+    Returns:
+        shifted_data: np.ndarray
+            Output array, with the same shape as data
+    """
+    shifted_data = np.roll(data, shift, axis=axis)
+    null_slice = slice(None, None)
+    if shift < 0:
+        part_slice = slice(shift, None)
+    else:
+        part_slice = slice(None, shift)
+    if axis == 1:
+        full_slice = (null_slice, part_slice)
+    else:
+        full_slice = (part_slice, null_slice)
+    shifted_data[full_slice] = pad_value
+    return shifted_data
+
+
 class LinkedListNode:
     def __init__(self, data):
         self.data = data
@@ -1039,5 +1070,3 @@ if __name__ == '__main__':
     start_coding_today()
     # today = 1
     # start_coding(today)
-
-
