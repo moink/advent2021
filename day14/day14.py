@@ -14,7 +14,7 @@ def read_insertion_map(map_part):
     insertion_map = {}
     for line in map_part:
         left, right = line.split(' -> ')
-        insertion_map[left.strip()] = right.strip()
+        insertion_map[left] = right
     return insertion_map
 
 
