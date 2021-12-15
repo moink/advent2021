@@ -18,7 +18,7 @@ def run_part_2(data):
         np.concatenate(
             [np.concatenate(
                 [np.mod(data + i + j - 1, 9) + 1 for j in range(5)], 1)
-             for i in range(5)], 0))
+                for i in range(5)], 0))
 
 
 def find_min_path(data):
@@ -28,10 +28,13 @@ def find_min_path(data):
     keep_going = True
     while keep_going:
         old_cost = cost
-        cost = np.minimum(cost, data + shift_with_padding(cost, -1, 0, big_number))
-        cost = np.minimum(cost, data + shift_with_padding(cost, 1, 0, big_number))
-        cost = np.minimum(cost, data + shift_with_padding(cost, -1, 1, big_number))
-        cost = np.minimum(cost, data + shift_with_padding(cost, 1, 1, big_number))
+        cost = np.minimum.reduce([
+            cost,
+            data + shift_with_padding(cost, -1, 0, big_number),
+            data + shift_with_padding(cost, 1, 0, big_number),
+            data + shift_with_padding(cost, -1, 1, big_number),
+            data + shift_with_padding(cost, 1, 1, big_number)
+        ])
         keep_going = np.abs(cost - old_cost).any().any()
     return cost[0, 0] - data[0, 0]
 
@@ -49,7 +52,6 @@ def shift_with_padding(data, shift, axis, pad_value):
         full_slice = (part_slice, null_slice)
     shifted_data[full_slice] = pad_value
     return shifted_data
-
 
 
 if __name__ == '__main__':
