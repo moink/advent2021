@@ -14,9 +14,11 @@ def run_part_1(min_y):
 
 
 def run_part_2(target):
-    min_x_vel = int(math.floor(math.sqrt(target[0])))
-    max_x_vel = target[1] + 1
-    max_y_vel = abs(target[1] + 1)
+    min_target_x = target[0]
+    max_target_x = target[1]
+    min_x_vel = int(math.floor(math.sqrt(min_target_x)))
+    max_x_vel = max_target_x + 1
+    max_y_vel = abs(max_target_x + 1)
     min_y_vel = -max_y_vel
     return sum(hits_target(target, x_vel, y_vel)
                for x_vel in range(min_x_vel, max_x_vel)
