@@ -49,10 +49,10 @@ def make_packet_with_sub_packets(bits, packet):
     if length_type_id == "0":
         length_of_sub_packets = int(bits[7:22], 2)
         sub_remainder = bits[22:22 + length_of_sub_packets]
-        bit_remainder = bits[22 + length_of_sub_packets:]
         while len(sub_remainder) > 0:
             sub_packet, sub_remainder = make_packet_tree(sub_remainder)
             packet["children"].append(sub_packet)
+        bit_remainder = bits[22 + length_of_sub_packets:]
     else:
         number_of_sub_packets = int(bits[7:18], 2)
         bit_remainder = bits[18:]
