@@ -1,6 +1,72 @@
 import unittest
 from day18 import *
 
+class TestIterateList(unittest.TestCase):
+
+    def test_iterate_list(self):
+        test_input = [[[[[9, 8], 1], 2], 3], 4]
+        result = list(iterate_list(test_input, 0))
+        expected_result = [
+            (0, [[[[[9, 8], 1], 2], 3], 4]),
+            (1, [[[[9, 8], 1], 2], 3]),
+            (2, [[[9, 8], 1], 2]),
+            (3, [[9, 8], 1]),
+            (4, [9, 8]),
+            (5, 9),
+            (5, 8),
+            (4, 1),
+            (3, 2),
+            (2, 3),
+            (1, 4),
+        ]
+        self.assertEqual(expected_result, result)
+
+
+class TestAppendEmptyToResult(unittest.TestCase):
+
+    def test_level_zero(self):
+        result = [1]
+        expected_result = [1]
+        expected_result.append([])
+        append_to_result(result, 0, [])
+        self.assertEqual(expected_result, result)
+
+    def test_level_one(self):
+        result = [1, [0]]
+        expected_result = [1, [0]]
+        expected_result[-1].append([])
+        append_to_result(result, 1, [])
+        self.assertEqual(expected_result, result)
+
+    def test_level_two(self):
+        result = [1, [0, [0]]]
+        expected_result = [1, [0, [0]]]
+        expected_result[-1][-1].append([])
+        append_to_result(result, 2, [])
+        self.assertEqual(expected_result, result)
+
+class TestAddToResult(unittest.TestCase):
+
+    def test_one_level(self):
+        result = [0]
+        add_to_result(result, [0], 1)
+        self.assertEqual([1], result)
+
+    def test_two_levels(self):
+        result = [[0]]
+        add_to_result(result, [0, 0], 1)
+        self.assertEqual([[1]], result)
+
+    def test_three_levels(self):
+        result = [[[0]]]
+        add_to_result(result, [0, 0, 0], 1)
+        self.assertEqual([[[1]]], result)
+
+    def test_complex(self):
+        result = [7, [6, [5, [4]]]]
+        add_to_result(result, [1, 1, 1, 0], 1)
+        self.assertEqual([7, [6, [5, [5]]]], result)
+
 
 class TestExplode(unittest.TestCase):
 
