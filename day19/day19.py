@@ -12,8 +12,8 @@ MIN_BEACON_OVERLAP = 12
 
 def main():
     start_time = time.perf_counter()
-    data = process_input(advent_tools.read_input_line_groups())
-    part1, part2 = run_both_parts(data)
+    scanner_readings = process_input(advent_tools.read_input_line_groups())
+    part1, part2 = run_both_parts(scanner_readings)
     print('Part 1:', part1)
     print('Part 2:', part2)
     print("Elapsed time", time.perf_counter() - start_time)
@@ -49,28 +49,28 @@ def manhattan_distance(scanner_pos1, scanner_pos2):
     return sum(abs(s2 - s1) for s1, s2 in zip(scanner_pos1, scanner_pos2))
 
 
-def run_both_parts(all_scanners):
-    unsolved_scanners = set(range(1, len(all_scanners)))
+def run_both_parts(scanner_readings):
+    unsolved_scanners = set(range(1, len(scanner_readings)))
     solved_scanners = collections.deque([0])
-    scanner_beacons = {0: {tuple(beacon) for beacon in all_scanners[0]}}
+    absolute_beacons = {0: {tuple(beacon) for beacon in scanner_readings[0]}}
     scanner_positions = [(0, 0, 0)]
     while unsolved_scanners:
         known_scanner = solved_scanners.pop()
-        unsolved_scanners = set(range(len(all_scanners))).difference(
-            scanner_beacons.keys())
+        unsolved_scanners = set(range(len(scanner_readings))).difference(
+            absolute_beacons.keys())
         for scanner_num in unsolved_scanners:
-            for oriented_scanner in all_orientations(all_scanners[scanner_num]):
-                distances = find_all_distances(scanner_beacons[known_scanner],
+            for oriented_scanner in all_orientations(scanner_readings[scanner_num]):
+                distances = find_all_distances(absolute_beacons[known_scanner],
                                                oriented_scanner)
                 for shift, count in collections.Counter(distances).items():
                     if count >= MIN_BEACON_OVERLAP:
-                        scanner_beacons[scanner_num] = {
+                        absolute_beacons[scanner_num] = {
                             tuple((beacon1 - shift).astype(int))
                             for beacon1 in oriented_scanner
                         }
                         solved_scanners.append(scanner_num)
                         scanner_positions.append(tuple(shift))
-    num_beacons = len({beacon for grid in scanner_beacons.values() for beacon in grid})
+    num_beacons = len({beacon for grid in absolute_beacons.values() for beacon in grid})
     max_distance = int(max(manhattan_distance(shift1, shift2)
                            for shift1, shift2
                            in itertools.combinations(scanner_positions, 2)))
