@@ -24,6 +24,44 @@ def process_input(data):
              for line in chunk[1:]] for chunk in data]
 
 
+def run_both_parts(scanner_readings):
+    unsolved_scanners = set(range(1, len(scanner_readings)))
+    solved_scanners = collections.deque([0])
+    absolute_beacons = {0: {tuple(beacon) for beacon in scanner_readings[0]}}
+    scanner_positions = [(0, 0, 0)]
+    while unsolved_scanners:
+        known_scanner = solved_scanners.pop()
+        unsolved_scanners = set(range(len(scanner_readings))).difference(
+            absolute_beacons.keys())
+        for scanner_num in unsolved_scanners:
+            solved, distance, abs_beacons = match_scanners(
+                absolute_beacons[known_scanner], scanner_readings[scanner_num]
+            )
+            if solved:
+                solved_scanners.append(scanner_num)
+                scanner_positions.append(distance)
+                absolute_beacons[scanner_num] = abs_beacons
+    num_beacons = len({beacon for grid in absolute_beacons.values() for beacon in grid})
+    max_distance = int(max(manhattan_distance(shift1, shift2)
+                           for shift1, shift2
+                           in itertools.combinations(scanner_positions, 2)))
+    return num_beacons, max_distance
+
+
+def match_scanners(known_scanner_readings, unknown_scanner_readings):
+    for oriented_scanner in all_orientations(unknown_scanner_readings):
+        distances = find_all_distances(known_scanner_readings,
+                                       oriented_scanner)
+        for distance, count in collections.Counter(distances).items():
+            if count >= MIN_BEACON_OVERLAP:
+                absolute_beacons = {
+                    tuple((beacon1 - distance).astype(int))
+                    for beacon1 in oriented_scanner
+                }
+                return True, tuple(distance), absolute_beacons
+    return False, None, None
+
+
 def all_orientations(scanner):
     for dir_x, dir_y in itertools.permutations(range(3), 2):
         for sign_x, sign_y in itertools.product((-1, 1), (-1, 1)):
@@ -47,34 +85,6 @@ def find_all_distances(scanner1, scanner2):
 
 def manhattan_distance(scanner_pos1, scanner_pos2):
     return sum(abs(s2 - s1) for s1, s2 in zip(scanner_pos1, scanner_pos2))
-
-
-def run_both_parts(scanner_readings):
-    unsolved_scanners = set(range(1, len(scanner_readings)))
-    solved_scanners = collections.deque([0])
-    absolute_beacons = {0: {tuple(beacon) for beacon in scanner_readings[0]}}
-    scanner_positions = [(0, 0, 0)]
-    while unsolved_scanners:
-        known_scanner = solved_scanners.pop()
-        unsolved_scanners = set(range(len(scanner_readings))).difference(
-            absolute_beacons.keys())
-        for scanner_num in unsolved_scanners:
-            for oriented_scanner in all_orientations(scanner_readings[scanner_num]):
-                distances = find_all_distances(absolute_beacons[known_scanner],
-                                               oriented_scanner)
-                for shift, count in collections.Counter(distances).items():
-                    if count >= MIN_BEACON_OVERLAP:
-                        absolute_beacons[scanner_num] = {
-                            tuple((beacon1 - shift).astype(int))
-                            for beacon1 in oriented_scanner
-                        }
-                        solved_scanners.append(scanner_num)
-                        scanner_positions.append(tuple(shift))
-    num_beacons = len({beacon for grid in absolute_beacons.values() for beacon in grid})
-    max_distance = int(max(manhattan_distance(shift1, shift2)
-                           for shift1, shift2
-                           in itertools.combinations(scanner_positions, 2)))
-    return num_beacons, max_distance
 
 
 if __name__ == '__main__':
