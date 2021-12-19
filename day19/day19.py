@@ -25,32 +25,31 @@ def process_input(data):
 
 
 def run_both_parts(scanner_readings):
-    unsolved_scanners = set(range(1, len(scanner_readings)))
-    solved_scanners = collections.deque([0])
-    absolute_beacons = {0: {tuple(beacon) for beacon in scanner_readings[0]}}
-    scanner_positions = [(0, 0, 0)]
+    absolute_beacons = {tuple(beacon) for beacon in scanner_readings[0]}
+    scanner_positions = {(0, 0, 0)}
+    solved_scanners = {0}
+    all_scanners = set(range(1, len(scanner_readings)))
+    unsolved_scanners = all_scanners
     while unsolved_scanners:
-        known_scanner = solved_scanners.pop()
-        unsolved_scanners = set(range(len(scanner_readings))).difference(
-            absolute_beacons.keys())
+        unsolved_scanners = all_scanners.difference(solved_scanners)
         for scanner_num in unsolved_scanners:
             solved, distance, abs_beacons = match_scanners(
-                absolute_beacons[known_scanner], scanner_readings[scanner_num]
+                absolute_beacons, scanner_readings[scanner_num]
             )
             if solved:
-                solved_scanners.append(scanner_num)
-                scanner_positions.append(distance)
-                absolute_beacons[scanner_num] = abs_beacons
-    num_beacons = len({beacon for grid in absolute_beacons.values() for beacon in grid})
+                solved_scanners.add(scanner_num)
+                scanner_positions.add(distance)
+                absolute_beacons = absolute_beacons.union(abs_beacons)
+    num_beacons = len(absolute_beacons)
     max_distance = int(max(manhattan_distance(shift1, shift2)
                            for shift1, shift2
                            in itertools.combinations(scanner_positions, 2)))
     return num_beacons, max_distance
 
 
-def match_scanners(known_scanner_readings, unknown_scanner_readings):
+def match_scanners(known_absolute_beacons, unknown_scanner_readings):
     for oriented_scanner in all_orientations(unknown_scanner_readings):
-        distances = find_all_distances(known_scanner_readings,
+        distances = find_all_distances(known_absolute_beacons,
                                        oriented_scanner)
         for distance, count in collections.Counter(distances).items():
             if count >= MIN_BEACON_OVERLAP:
