@@ -1,49 +1,27 @@
-import contextlib
 import collections
-import copy
-import functools
 import itertools
-import math
 import re
-import statistics
+import time
 
 import numpy as np
-import pandas as pd
-from matplotlib import pyplot as plt
 
 import advent_tools
 
-ALL_AXES = (0, 1, 2)
+MIN_BEACON_OVERLAP = 12
 
-SIZE = 1000
 
 def main():
-    # advent_tools.TESTING = True
-    # data = advent_tools.read_all_integers()
-    # data = advent_tools.read_whole_input()
-    # data = advent_tools.read_input_lines()
-    # data = advent_tools.read_input_no_strip()
-    # data = advent_tools.read_dict_from_input_file(sep=' => ', key='left')
-    # data = advent_tools.read_dict_of_list_from_file(sep=' => ', key='left')
-    # data = advent_tools.read_one_int_per_line()
-    # data = advent_tools.PlottingGrid.from_file({'.' : 0, '#' : 1})
-    data = advent_tools.read_input_line_groups()
-    # data = advent_tools.read_nparray_from_digits()
-    data = process_input(data)
-    print('Part 1:', run_part_1(data))
-    print('Part 2:', run_part_2(data))
+    start_time = time.perf_counter()
+    data = process_input(advent_tools.read_input_line_groups())
+    part1, part2 = run_both_parts(data)
+    print('Part 1:', part1)
+    print('Part 2:', part2)
+    print("Elapsed time", time.perf_counter() - start_time)
 
 
 def process_input(data):
-    result = []
-    for chunk in data:
-        result.append([])
-        for line in chunk[1:]:
-            result[-1].append(
-                np.asarray
-                ([int(num_str) for num_str in (re.findall(r'-?[0-9]+', line))])
-            )
-    return result
+    return [[np.asarray([int(num_str) for num_str in (re.findall(r'-?[0-9]+', line))])
+             for line in chunk[1:]] for chunk in data]
 
 
 def all_orientations(grid):
@@ -65,38 +43,38 @@ def all_orientations(grid):
 
 
 def find_all_distances(grid1, grid2):
-    return([tuple(vec2 - vec1) for vec1, vec2 in itertools.product(grid1, grid2)])
-
-
-def shift_beacons(grid, shift):
-    return {tuple((beacon - shift).astype(int)) for beacon in grid}
+    return [tuple((vec2 - vec1).astype(int))
+            for vec1, vec2 in itertools.product(grid1, grid2)]
 
 
 def manhattan_distance(shift1, shift2):
     return sum(abs(s2 - s1) for s1, s2 in zip(shift1, shift2))
 
 
-def run_part_1(data):
-    unknown = set(range(1, len(data)))
-    to_evaluate = collections.deque([0])
-    grids = {0: {tuple(beacon) for beacon in data[0]}}
+def run_both_parts(data):
+    unsolved_scanners = set(range(1, len(data)))
+    solved_scanners = collections.deque([0])
+    scanner_beacons = {0: {tuple(beacon) for beacon in data[0]}}
     shifts = [(0, 0, 0)]
-    while unknown:
-        i = to_evaluate.pop()
-        unknown = set(range(len(data))).difference(grids.keys())
-        for j in unknown:
-            for grid in all_orientations(data[j]):
-                 distances = find_all_distances(grids[i], grid)
-                 for shift, count in collections.Counter(distances).items():
-                     if count >= 12:
-                        grids[j] = shift_beacons(grid, shift)
-                        to_evaluate.append(j)
+    while unsolved_scanners:
+        known_scanner = solved_scanners.pop()
+        unsolved_scanners = set(range(len(data))).difference(scanner_beacons.keys())
+        for checking_scanner in unsolved_scanners:
+            for oriented_scanner in all_orientations(data[checking_scanner]):
+                distances = find_all_distances(scanner_beacons[known_scanner],
+                                               oriented_scanner)
+                for shift, count in collections.Counter(distances).items():
+                    if count >= MIN_BEACON_OVERLAP:
+                        scanner_beacons[checking_scanner] = {
+                            tuple((beacon1 - shift).astype(int))
+                            for beacon1 in oriented_scanner
+                        }
+                        solved_scanners.append(checking_scanner)
                         shifts.append(tuple(shift))
-    all_beacons = {beacon for grid in grids.values() for beacon in grid}
-    return max(manhattan_distance(shift1, shift2) for shift1, shift2 in itertools.combinations(shifts, 2))
-
-def run_part_2(data):
-    pass
+    num_beacons = len({beacon for grid in scanner_beacons.values() for beacon in grid})
+    max_distance = int(max(manhattan_distance(shift1, shift2)
+                           for shift1, shift2 in itertools.combinations(shifts, 2)))
+    return num_beacons, max_distance
 
 
 if __name__ == '__main__':
