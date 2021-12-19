@@ -24,7 +24,7 @@ def process_input(data):
              for line in chunk[1:]] for chunk in data]
 
 
-def all_orientations(grid):
+def all_orientations(scanner):
     for dir_x, dir_y in itertools.permutations(range(3), 2):
         for sign_x, sign_y in itertools.product((-1, 1), (-1, 1)):
             x_vec = np.zeros((3,))
@@ -32,48 +32,48 @@ def all_orientations(grid):
             x_vec[dir_x] = sign_x
             y_vec[dir_y] = sign_y
             z_vec = np.cross(x_vec, y_vec)
-            new_grid = []
-            for line in grid:
-                new_grid.append(np.asarray((
-                    np.dot(x_vec, line),
-                    np.dot(y_vec, line),
-                    np.dot(z_vec, line),
-                )))
-            yield new_grid
+            yield [
+                (np.asarray((
+                    np.dot(x_vec, beacon),
+                    np.dot(y_vec, beacon),
+                    np.dot(z_vec, beacon),
+                ))) for beacon in scanner]
 
 
-def find_all_distances(grid1, grid2):
-    return [tuple((vec2 - vec1).astype(int))
-            for vec1, vec2 in itertools.product(grid1, grid2)]
+def find_all_distances(scanner1, scanner2):
+    return [tuple((beacon2 - beacon1).astype(int))
+            for beacon1, beacon2 in itertools.product(scanner1, scanner2)]
 
 
-def manhattan_distance(shift1, shift2):
-    return sum(abs(s2 - s1) for s1, s2 in zip(shift1, shift2))
+def manhattan_distance(scanner_pos1, scanner_pos2):
+    return sum(abs(s2 - s1) for s1, s2 in zip(scanner_pos1, scanner_pos2))
 
 
-def run_both_parts(data):
-    unsolved_scanners = set(range(1, len(data)))
+def run_both_parts(all_scanners):
+    unsolved_scanners = set(range(1, len(all_scanners)))
     solved_scanners = collections.deque([0])
-    scanner_beacons = {0: {tuple(beacon) for beacon in data[0]}}
-    shifts = [(0, 0, 0)]
+    scanner_beacons = {0: {tuple(beacon) for beacon in all_scanners[0]}}
+    scanner_positions = [(0, 0, 0)]
     while unsolved_scanners:
         known_scanner = solved_scanners.pop()
-        unsolved_scanners = set(range(len(data))).difference(scanner_beacons.keys())
-        for checking_scanner in unsolved_scanners:
-            for oriented_scanner in all_orientations(data[checking_scanner]):
+        unsolved_scanners = set(range(len(all_scanners))).difference(
+            scanner_beacons.keys())
+        for scanner_num in unsolved_scanners:
+            for oriented_scanner in all_orientations(all_scanners[scanner_num]):
                 distances = find_all_distances(scanner_beacons[known_scanner],
                                                oriented_scanner)
                 for shift, count in collections.Counter(distances).items():
                     if count >= MIN_BEACON_OVERLAP:
-                        scanner_beacons[checking_scanner] = {
+                        scanner_beacons[scanner_num] = {
                             tuple((beacon1 - shift).astype(int))
                             for beacon1 in oriented_scanner
                         }
-                        solved_scanners.append(checking_scanner)
-                        shifts.append(tuple(shift))
+                        solved_scanners.append(scanner_num)
+                        scanner_positions.append(tuple(shift))
     num_beacons = len({beacon for grid in scanner_beacons.values() for beacon in grid})
     max_distance = int(max(manhattan_distance(shift1, shift2)
-                           for shift1, shift2 in itertools.combinations(shifts, 2)))
+                           for shift1, shift2
+                           in itertools.combinations(scanner_positions, 2)))
     return num_beacons, max_distance
 
 
