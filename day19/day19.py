@@ -33,16 +33,17 @@ def run_both_parts(scanner_readings):
     while unsolved_scanners:
         unsolved_scanners = all_scanners.difference(solved_scanners)
         for scanner_num in unsolved_scanners:
-            solved, distance, abs_beacons = match_scanners(
+            solved, position, abs_beacons = match_scanners(
                 absolute_beacons, scanner_readings[scanner_num]
             )
             if solved:
                 solved_scanners.add(scanner_num)
-                scanner_positions.add(distance)
+                scanner_positions.add(position)
                 absolute_beacons = absolute_beacons.union(abs_beacons)
-    max_distance = int(max(manhattan_distance(shift1, shift2)
-                           for shift1, shift2
-                           in itertools.combinations(scanner_positions, 2)))
+    max_distance = int(max(
+        manhattan_distance(shift1, shift2)
+        for shift1, shift2 in itertools.combinations(scanner_positions, 2)
+    ))
     return len(absolute_beacons), max_distance
 
 
