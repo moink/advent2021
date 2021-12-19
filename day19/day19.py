@@ -40,11 +40,10 @@ def run_both_parts(scanner_readings):
                 solved_scanners.add(scanner_num)
                 scanner_positions.add(distance)
                 absolute_beacons = absolute_beacons.union(abs_beacons)
-    num_beacons = len(absolute_beacons)
     max_distance = int(max(manhattan_distance(shift1, shift2)
                            for shift1, shift2
                            in itertools.combinations(scanner_positions, 2)))
-    return num_beacons, max_distance
+    return len(absolute_beacons), max_distance
 
 
 def match_scanners(known_absolute_beacons, unknown_scanner_readings):
@@ -63,7 +62,7 @@ def match_scanners(known_absolute_beacons, unknown_scanner_readings):
 
 def all_orientations(scanner):
     for dir_x, dir_y in itertools.permutations(range(3), 2):
-        for sign_x, sign_y in itertools.product((-1, 1), (-1, 1)):
+        for sign_x, sign_y in itertools.product((-1, 1), repeat=2):
             x_vec = np.zeros((3,))
             y_vec = np.zeros((3,))
             x_vec[dir_x] = sign_x
