@@ -301,7 +301,33 @@ class PlottingGrid:
         return new_grid
 
     @classmethod
-    def get_shape_from_file(cls):
+    def from_str(cls, char_map=None, dimension=2, padding=0, text=None):
+        """Create a new plotting grid from today's input file
+
+        Alternative constructor
+
+        Args:
+            char_map: {str: int}
+                Mapping of characters in the file to integers in the numpy
+                array. Optional, default {'.' : 0, '#' : 1} which is typical
+                Topaz-notation for a maze with open areas and walls
+            dimension: int
+                Dimension of the resulting grid. Optional, default 2
+            padding: int
+                Padding to apply in each direction in all dimensions to the size of
+                the grid
+        Returns:
+            None
+        """
+        a, b = cls.get_shape_from_file(text)
+        shape = (tuple(2 * padding for _ in range(dimension - 2))
+                 + (a + 2 * padding, b + 2 * padding))
+        new_grid = cls(shape)
+        new_grid.read_input_file(char_map, dimension, padding, text)
+        return new_grid
+
+    @classmethod
+    def get_shape_from_file(cls, text=None):
         """Determine the shape of the grid from the input file
 
         Returns:
@@ -310,13 +336,14 @@ class PlottingGrid:
             max_x:
                 Maximum number of characters in a line of the file
         """
-        text = read_input_lines()
-        max_y = len(read_input_lines())
+        if text is None:
+            text = read_input_lines()
+        max_y = len(text)
         max_x = max(len(line) for line in text)
         print(f'Size of grid in file is ({max_y}, {max_x})')
         return max_y, max_x
 
-    def read_input_file(self, char_map=None, dimension=2, padding=0):
+    def read_input_file(self, char_map=None, dimension=2, padding=0, text=None):
         """Read and store the grid from today's input file
 
         Args:
@@ -334,7 +361,10 @@ class PlottingGrid:
         """
         if char_map is None:
             char_map = {'.': 0, '#': 1}
-        lines = read_input_no_strip()
+        if text is None:
+            lines = read_input_no_strip()
+        else:
+            lines = text
         for y_pos, line in enumerate(lines):
             for x_pos, char in enumerate(line):
                 index = (tuple(padding for _ in range(dimension - 2))
