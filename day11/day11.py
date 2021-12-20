@@ -38,6 +38,5 @@ def run_both_parts(energy):
             return part1_sol, step
 
 
-
 if __name__ == '__main__':
     main()

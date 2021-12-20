@@ -34,5 +34,6 @@ def run_part(polymer, insertion_map, steps):
         pair_counts = new_pair_counts
     return max(char_counts.values()) - min(char_counts.values())
 
+
 if __name__ == '__main__':
     main()

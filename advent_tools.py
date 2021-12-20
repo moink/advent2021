@@ -253,6 +253,7 @@ def read_nparray_from_digits():
             result[i, j] = int(char)
     return result
 
+
 class PlottingGrid:
     """A tool for maintaining and plotting a grid of numbers
 
@@ -579,7 +580,7 @@ class StateForGraphs(abc.ABC):
             Set of StateForGraphs
                 States reachable from this state in one step
         """
-        return set(copy.deepcopy(self))
+        return {copy.deepcopy(self)}
 
 
 def number_of_bfs_steps(current_state):
@@ -1086,7 +1087,7 @@ class CircularLinkedList:
         n = 100
         count = 0
         while place != self.head:
-            count+=1
+            count += 1
             if count > n:
                 raise RuntimeError('lost head')
             if place == self.current:

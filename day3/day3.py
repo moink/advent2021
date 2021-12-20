@@ -1,9 +1,8 @@
 import advent_tools
-from advent_tools import input_filename
 
 
 def main():
-    with open('input.txt') as in_file:
+    with open(advent_tools.input_filename()) as in_file:
         data = in_file.readlines()
     print('Part 1:', run_part_1(data))
     print('Part 2:', run_part_2(data))
