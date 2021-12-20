@@ -29,8 +29,7 @@ def run_part(grid, algo, steps):
                         else:
                             val = off_edges_val
                         nums.append(str(val))
-                lookup_val = int("".join(nums), 2)
-                new_grid.grid[j + 1, i + 1] = algo[lookup_val]
+                new_grid.grid[j + 1, i + 1] = algo[int("".join(nums), 2)]
         grid = new_grid
         if off_edges_val == 0:
             off_edges_val = algo[0]
