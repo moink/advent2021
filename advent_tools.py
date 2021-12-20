@@ -293,20 +293,19 @@ class PlottingGrid:
         Returns:
             None
         """
-        a, b = cls.get_shape_from_file()
-        shape = (tuple(2 * padding for _ in range(dimension - 2))
-                 + (a + 2 * padding, b + 2 * padding))
-        new_grid = cls(shape)
-        new_grid.read_input_file(char_map, dimension, padding)
-        return new_grid
+        lines = read_input_lines()
+        return cls.from_lines(lines, char_map, dimension, padding)
 
     @classmethod
-    def from_str(cls, char_map=None, dimension=2, padding=0, text=None):
-        """Create a new plotting grid from today's input file
+    def from_lines(cls, lines, char_map=None, dimension=2, padding=0):
+        """Create a new plotting grid from a list of lists of strings
 
         Alternative constructor
 
         Args:
+            lines: [[str]]
+                Lines that specify the grid. Each line corresponds to one row of the
+                resulting grid
             char_map: {str: int}
                 Mapping of characters in the file to integers in the numpy
                 array. Optional, default {'.' : 0, '#' : 1} which is typical
@@ -319,39 +318,45 @@ class PlottingGrid:
         Returns:
             None
         """
-        a, b = cls.get_shape_from_file(text)
+        a, b = cls.get_shape_from_lines(lines)
         shape = (tuple(2 * padding for _ in range(dimension - 2))
                  + (a + 2 * padding, b + 2 * padding))
         new_grid = cls(shape)
-        new_grid.read_input_file(char_map, dimension, padding, text)
+        new_grid.read_lines(lines, char_map, dimension, padding)
         return new_grid
 
     @classmethod
-    def get_shape_from_file(cls, text=None):
+    def get_shape_from_lines(cls, lines):
         """Determine the shape of the grid from the input file
 
+        Parameters:
+            lines: [[str]]
+                Lines that specify the grid. Each line corresponds to one row of the
+                resulting grid
+
         Returns:
-            max_y:
+            max_y: int
                 Number of lines in the file
-            max_x:
+            max_x: int
                 Maximum number of characters in a line of the file
         """
-        if text is None:
-            text = read_input_lines()
-        max_y = len(text)
-        max_x = max(len(line) for line in text)
-        print(f'Size of grid in file is ({max_y}, {max_x})')
+        max_y = len(lines)
+        max_x = max(len(line) for line in lines)
+        print(f'Size of grid is ({max_y}, {max_x})')
         return max_y, max_x
 
-    def read_input_file(self, char_map=None, dimension=2, padding=0, text=None):
-        """Read and store the grid from today's input file
+    def read_lines(self, lines, char_map=None, dimension=2, padding=0):
+        """Read and store the grid from a list of lists of strings
 
         Args:
+            lines: [[str]]
+                Lines that specify the grid. Each line corresponds to one row of the
+                resulting grid
             char_map: {str: int}
                 Mapping of characters in the file to integers in the numpy
                 array. The default is {'.': 0, '#': 1} which is typical
                 Topaz-notation for a maze with open areas and walls
-        dimension: int
+            dimension: int
                 Dimension of the resulting grid. Optional, default 2
             padding: int
                 Padding to apply in each direction in all dimensions to the size of
@@ -361,10 +366,6 @@ class PlottingGrid:
         """
         if char_map is None:
             char_map = {'.': 0, '#': 1}
-        if text is None:
-            lines = read_input_no_strip()
-        else:
-            lines = text
         for y_pos, line in enumerate(lines):
             for x_pos, char in enumerate(line):
                 index = (tuple(padding for _ in range(dimension - 2))

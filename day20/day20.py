@@ -10,7 +10,7 @@ def main():
 
 def process_input(data):
     algo = [0 if char == "." else 1 for char in data[0][0]]
-    grid = advent_tools.PlottingGrid.from_str(text=data[1])
+    grid = advent_tools.PlottingGrid.from_lines(lines=data[1])
     return grid, algo
 
 
