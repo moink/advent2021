@@ -1,4 +1,5 @@
 import collections
+import functools
 import itertools
 import time
 
@@ -6,6 +7,9 @@ import advent_tools
 
 MIN_SCORE_TO_WIN = 21
 
+ROLL_SUM_COUNTS = collections.Counter(
+    sum(rolls) for rolls in itertools.product(range(1, 4), repeat=3)
+)
 
 def main():
     data = advent_tools.read_all_integers()
@@ -19,14 +23,9 @@ def main():
     print("Elapsed time:", elapsed)
 
 
-def get_roll(roll_num, player_num):
-    a = 9 * player_num - 3
-    return 18 * roll_num + a
-
-
 def get_points(roll_num, player_num, start):
-    s = sum(get_roll(i, player_num) for i in range(roll_num + 1)) + start
-    return (s - 1) % 10 + 1
+    return (sum(18 * i + 9 * player_num - 3 for i in range(roll_num + 1))
+            + start) % 10 or 10
 
 
 def run_part_1(start1, start2):
@@ -47,37 +46,23 @@ def run_part_1(start1, start2):
     return 3 * min(sum1, sum2) * (rolls1 + rolls2 + 2)
 
 
-def run_part_2(start1, start2):
-    counts = collections.Counter(
-        sum(rolls) for rolls in itertools.product(range(1, 4), repeat=3)
-    )
-    state_counts = {(start1, 0, start2, 0): 1}
-    win1 = 0
-    win2 = 0
-    while state_counts:
-        new_states = collections.defaultdict(int)
-        for roll_sum, roll_count in counts.items():
-            for (p1_spot, p1_points, p2_spot, p2_points), count in state_counts.items():
-                p1_spot = (p1_spot + roll_sum - 1) % 10 + 1
-                p1_points += p1_spot
-                if p1_points >= MIN_SCORE_TO_WIN:
-                    win1 += count * roll_count
-                else:
-                    state = (p1_spot, p1_points, p2_spot, p2_points)
-                    new_states[state] += count * roll_count
-        state_counts = {**new_states}
-        new_states = collections.defaultdict(int)
-        for p2_roll_sum, p2_count in counts.items():
-            for (p1_spot, p1_points, p2_spot, p2_points), count in state_counts.items():
-                p2_spot = (p2_spot + p2_roll_sum - 1) % 10 + 1
-                p2_points += p2_spot
-                if p2_points >= MIN_SCORE_TO_WIN:
-                    win2 += count * p2_count
-                else:
-                    state = (p1_spot, p1_points, p2_spot, p2_points)
-                    new_states[state] += count * p2_count
-        state_counts = {**new_states}
-    return max(win1, win2)
+@functools.lru_cache(None)
+def count_states(my_score, my_pos, opp_score, opp_pos):
+    if opp_score >= 21:
+        return 0, 1
+    my_total = 0
+    opp_total = 0
+    for roll_sum, count in ROLL_SUM_COUNTS.items():
+        new_pos = (my_pos + roll_sum) % 10 or 10
+        new_score = my_score + new_pos
+        opp_wins, my_wins = count_states(opp_score, opp_pos, new_score, new_pos)
+        my_total += count * my_wins
+        opp_total += count * opp_wins
+    return my_total, opp_total
+
+
+def run_part_2(p1start, p2start):
+    return max(count_states(0, p1start, 0, p2start))
 
 
 if __name__ == '__main__':
