@@ -413,7 +413,7 @@ class PlottingGrid:
         elif dimension == 4:
             self.draw_4d()
         # Do nothing for higher dimensions
-        # plt.colorbar()
+        plt.colorbar()
 
     def draw_3d(self):
         """Draw 2D slices through the 3D grid in subplots"""
