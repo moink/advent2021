@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
+
 def main():
     times = {1: 5.359699935070239e-05,
              11: 0.0017659000004641712,
@@ -33,25 +34,27 @@ def main():
 def extrapolate_cubic(times):
     time_series = pd.Series(times)
     time_fit = np.polyfit(time_series.index, time_series.values, 3)
-    time_pred = np.polyval(time_fit, time_series.index)
-    pred_series = pd.Series(time_pred, index=time_series.index)
+    predicted_time = np.polyval(time_fit, time_series.index)
+    predicted_series = pd.Series(predicted_time, index=time_series.index)
     time_series.plot()
-    pred_series.plot()
+    predicted_series.plot()
     print("Predicted time: ", np.polyval(time_fit, 1000) / 60 / 60, "hours")
     plt.show()
 
-def extrapolate_exponential(times):
-    time_series = pd.Series(times)
-    time_fit = np.polyfit(time_series.index, np.log(time_series.values), 1)
-    time_pred = np.exp(np.polyval(time_fit, time_series.index))
-    pred_series = pd.Series(time_pred, index=time_series.index)
-    time_series.plot(logy=True)
-    pred_series.plot(logy=True)
-    full_exponent = np.polyval(time_fit, 1000) * 0.43429
+
+def extrapolate_exponential(values):
+    series = pd.Series(values)
+    fit = np.polyfit(series.index, np.log(series.values), 1)
+    prediction = np.exp(np.polyval(fit, series.index))
+    predicted_series = pd.Series(prediction, index=series.index)
+    series.plot(logy=True)
+    predicted_series.plot(logy=True)
+    full_exponent = np.polyval(fit, 1000) * 0.43429
     log_mantissa, exponent = math.modf(full_exponent)
     mantissa = 10**log_mantissa
     print(f"Predicted value: {mantissa} * 10^{int(exponent)}")
     plt.show()
+
 
 if __name__ == "__main__":
     main()

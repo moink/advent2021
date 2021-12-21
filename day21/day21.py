@@ -2,9 +2,6 @@ import collections
 import itertools
 import time
 
-import pandas as pd
-from matplotlib import pyplot as plt
-
 import advent_tools
 
 MIN_SCORE_TO_WIN = 21
@@ -20,7 +17,6 @@ def main():
     print('Part 2:', part2)
     elapsed = time.perf_counter() - start_time
     print("Elapsed time:", elapsed)
-
 
 
 def get_roll(roll_num, player_num):
