@@ -10,6 +10,7 @@ import math
 import os
 import re
 import shutil
+import sys
 import urllib.request
 import warnings
 
@@ -749,6 +750,43 @@ def find_all_final_states(current_state):
                 discovered.add(new_state)
                 stack.append(new_state)
     return final_states
+
+
+def bfs_min_cost_path(current_state):
+    """Return all discoverable final states with a BFS search
+
+    Args:
+        current_state: StateForGraphs
+            The state at the beginning of the search; the root of the tree.
+
+    Returns:
+        final_state: set of StateForGraphs
+            All states reachable from the current state
+
+    See Also: StateForGraphs
+        to understand the required methods for the states used in the graph.
+        The states must implement __hash__, __eq__, possible_next_states,
+        and is_final
+    """
+    final_states = {}
+    queue = collections.deque()
+    discovered = {current_state: 0}
+    queue.append(current_state)
+    while queue:
+        state = queue.popleft()
+        cost = discovered[state]
+        new_states = state.possible_next_states()
+        for new_state, step_cost in new_states:
+            new_cost = min(
+                cost + step_cost,
+                discovered.get(new_state, float("inf"))
+            )
+            if new_state.is_final():
+                final_states[new_state] = new_cost
+            elif new_state not in discovered:
+                queue.append(new_state)
+            discovered[new_state] = new_cost
+    return min(final_states.values())
 
 
 class Computer(abc.ABC):

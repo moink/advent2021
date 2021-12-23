@@ -15,9 +15,9 @@ def main():
     print('Part 2:', run_program(instructions, False))
 
 
-def process_input(data, lines):
+def process_input(integers, lines):
     result = []
-    for coordinates, l in zip(data, lines):
+    for coordinates, l in zip(integers, lines):
         try:
             x1, x2, y1, y2, z1, z2 = coordinates
         except ValueError:
