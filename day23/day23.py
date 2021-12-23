@@ -12,8 +12,16 @@ STEP_COSTS = {"A": 1, "B": 10, "C": 100, "D": 1000}
 
 
 def main():
-    print('Part 1:', run_part_1(["AD", "CD", "BB", "AC"]))
-    print('Part 2:', run_part_2(["ADDD", "CCBD", "BBAB", "AACC"]))
+    lines = advent_tools.read_input_lines()
+    print('Part 1:', run_part_1(read_rooms_from_lines(lines)))
+    rooms = read_rooms_from_lines(lines[0:3] + ["#D#C#B#A#", "#D#B#A#C#"] + lines[3:])
+    print('Part 2:', run_part_2(rooms))
+
+
+def read_rooms_from_lines(lines):
+    chars = [[char for char in line if char not in " #"]
+             for line in lines[2:len(lines) - 1]]
+    return ["".join(room) for room in zip(*chars)]
 
 
 class AmphiState(advent_tools.StateForGraphs):
