@@ -530,7 +530,8 @@ class StateForGraphs(abc.ABC):
 
     The second requirement is to implement possible_next_states,
     which provides the edges of the graphs connected to this node, or state.
-    That's where the real meat of the problem will end up.
+    That's where the real meat of the problem will end up. If you want to use
+    the bfs_min_cost_path function
 
     The third requirement is to implement is_final, which tells the BFS
     search when it has reached the destination node.
@@ -548,6 +549,14 @@ class StateForGraphs(abc.ABC):
         """Return string representation. Used for hashing and comparing equal
         """
         pass
+
+    def __repr__(self):
+        """Return string representation shown in debugging tools
+
+        I find it easiest to debug this, for example when calling AssertEqual on this
+        object, using the string representation.
+        """
+        return str(self)
 
     def __hash__(self):
         return hash(str(self))
@@ -753,7 +762,11 @@ def find_all_final_states(current_state):
 
 
 def bfs_min_cost_path(current_state):
-    """Return all discoverable final states with a BFS search
+    """Return the minimum cost to get to the final state from the current state
+
+    For this function to work, the possible_next_states method of the StateForGraphs
+    must return a set of tuples of next states and the cost of moving from the current
+    state to the next one
 
     Args:
         current_state: StateForGraphs
