@@ -1,5 +1,5 @@
 import unittest
-from day23 import AmphiState, AmphiState2, EMPTY_HALLWAY, space_above_room, run_part_1, run_part_2
+from day23 import AmphiState, AmphiState, EMPTY_HALLWAY, space_above_room, run_part_1, run_part_2
 
 
 class TestSpaceAboveRoom(unittest.TestCase):
@@ -105,8 +105,8 @@ class TestPossibleNextSteps(unittest.TestCase):
 class TestPossibleNextStepsPartTwo(unittest.TestCase):
 
     def run_steps_test(self, hallway0, rooms0, hallway1, rooms1, cost):
-        first_state = AmphiState2(hallway0, rooms0)
-        next_step = AmphiState2(hallway1, rooms1)
+        first_state = AmphiState(hallway0, rooms0)
+        next_step = AmphiState(hallway1, rooms1)
         result = first_state.possible_next_states()
         self.assertIn((next_step, cost), result)
 
@@ -183,6 +183,23 @@ class TestPossibleNextStepsPartTwo(unittest.TestCase):
         )
 
 
+class TestIsFinal(unittest.TestCase):
+
+    def test_part_1_not_final(self):
+        state = AmphiState(EMPTY_HALLWAY, ["BA", "CD", "BC", "DA"])
+        self.assertFalse(state.is_final())
+
+    def test_part_1_is_final(self):
+        state = AmphiState(EMPTY_HALLWAY, ["AA", "BB", "CC", "DD"])
+        self.assertTrue(state.is_final())
+
+    def test_part_2_not_final(self):
+        state = AmphiState(EMPTY_HALLWAY, ["ADDD", "CCBD", "BBAB", "AACC"])
+        self.assertFalse(state.is_final())
+
+    def test_part_2_is_final(self):
+        state = AmphiState(EMPTY_HALLWAY, ["AAAA", "BBBB", "CCCC", "DDDD"])
+        self.assertTrue(state.is_final())
 
 class TestParts(unittest.TestCase):
 

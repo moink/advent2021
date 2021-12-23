@@ -21,6 +21,7 @@ class AmphiState(advent_tools.StateForGraphs):
     def __init__(self, hallway, rooms):
         self.hallway = [char for char in hallway]
         self.rooms = [[char for char in room] for room in rooms]
+        self.room_size = len(rooms[0])
 
     def __str__(self):
         return "_".join(
@@ -28,7 +29,10 @@ class AmphiState(advent_tools.StateForGraphs):
         )
 
     def is_final(self):
-        return self.rooms == [["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]]
+        for amphi, room_num in DESTINATION_ROOMS.items():
+            if not all(char == amphi for char in self.rooms[room_num]):
+                return False
+        return True
 
     def possible_next_states(self):
         heuristic_order = [
@@ -46,27 +50,43 @@ class AmphiState(advent_tools.StateForGraphs):
 
     def move_down_in_rooms(self):
         for room_num, room in enumerate(self.rooms):
-            moving_amphi = room[0]
-            if (is_empty(room[1]) and not is_empty(moving_amphi)
-                    and DESTINATION_ROOMS[moving_amphi] == room_num):
-                new_hallway, new_rooms = self.copy_hallway_and_rooms()
-                new_rooms[room_num] = [".", moving_amphi]
-                return {(
-                    self.__class__(new_hallway, new_rooms),
-                    STEP_COSTS[moving_amphi])}
-        return set()
-
-    def move_up_in_rooms(self):
-        for room_num, room in enumerate(self.rooms):
-            if not (is_empty(room[1])):
-                moving_amphi = room[1]
-                if is_empty(room[0]) and room_num != DESTINATION_ROOMS[moving_amphi]:
+            for pos in range(self.room_size - 1):
+                moving_amphi = room[pos]
+                if (is_empty(room[pos + 1]) and not is_empty(moving_amphi)
+                        and DESTINATION_ROOMS[moving_amphi] == room_num
+                        and all(char in [moving_amphi, "."] for char in room[pos:])):
                     new_hallway, new_rooms = self.copy_hallway_and_rooms()
-                    new_rooms[room_num] = [moving_amphi, "."]
+                    new_rooms[room_num][pos] = "."
+                    new_rooms[room_num][pos + 1] = moving_amphi
                     return {(
                         self.__class__(new_hallway, new_rooms),
                         STEP_COSTS[moving_amphi])}
         return set()
+
+    def move_up_in_rooms(self):
+        for room_num, room in enumerate(self.rooms):
+            for pos in range(1, self.room_size):
+                moving_amphi = room[pos]
+                if not (is_empty(moving_amphi)):
+                    if self.can_move_up_in_room(room_num, pos):
+                        new_hallway, new_rooms = self.copy_hallway_and_rooms()
+                        new_rooms[room_num][pos] = "."
+                        new_rooms[room_num][pos - 1] = moving_amphi
+                        return {(
+                            self.__class__(new_hallway, new_rooms),
+                            STEP_COSTS[moving_amphi]
+                        )}
+        return set()
+
+    def can_move_up_in_room(self, room_num, pos):
+        room = self.rooms[room_num]
+        moving_amphi = room[pos]
+        if not is_empty(room[pos - 1]):
+            return False
+        return (
+                room_num != DESTINATION_ROOMS[moving_amphi]
+                or not all(char in [moving_amphi, "."] for char in room[pos:])
+        )
 
     def room_to_hallway_moves(self):
         all_states = set()
@@ -163,55 +183,6 @@ class AmphiState(advent_tools.StateForGraphs):
         return is_empty(self.hallway[a:b])
 
 
-class AmphiState2(AmphiState):
-
-    def is_final(self):
-        return self.rooms == [
-            ["A", "A", "A", "A"], ["B", "B", "B", "B"],
-            ["C", "C", "C", "C"], ["D", "D", "D", "D"]
-        ]
-
-    def move_down_in_rooms(self):
-        for room_num, room in enumerate(self.rooms):
-            for pos in range(3):
-                moving_amphi = room[pos]
-                if (is_empty(room[pos + 1]) and not is_empty(moving_amphi)
-                        and DESTINATION_ROOMS[moving_amphi] == room_num
-                        and all(char in [moving_amphi, "."] for char in room[pos:])):
-                    new_hallway, new_rooms = self.copy_hallway_and_rooms()
-                    new_rooms[room_num][pos] = "."
-                    new_rooms[room_num][pos + 1] = moving_amphi
-                    return{(
-                        self.__class__(new_hallway, new_rooms),
-                        STEP_COSTS[moving_amphi])}
-        return set()
-
-    def move_up_in_rooms(self):
-        for room_num, room in enumerate(self.rooms):
-            for pos in range(1, 4):
-                moving_amphi = room[pos]
-                if not (is_empty(moving_amphi)):
-                    if self.can_move_up_in_room(room_num, pos):
-                        new_hallway, new_rooms = self.copy_hallway_and_rooms()
-                        new_rooms[room_num][pos] = "."
-                        new_rooms[room_num][pos - 1] = moving_amphi
-                        return {(
-                            self.__class__(new_hallway, new_rooms),
-                            STEP_COSTS[moving_amphi]
-                        )}
-        return set()
-
-    def can_move_up_in_room(self, room_num, pos):
-        room = self.rooms[room_num]
-        moving_amphi = room[pos]
-        if not is_empty(room[pos - 1]):
-            return False
-        return (
-            room_num != DESTINATION_ROOMS[moving_amphi]
-            or not all(char in [moving_amphi, "."] for char in room[pos:])
-        )
-
-
 def is_empty(location):
     if len(location) == 1:
         return location == "."
@@ -228,7 +199,7 @@ def run_part_1(rooms):
 
 
 def run_part_2(rooms):
-    first_state = AmphiState2(EMPTY_HALLWAY, rooms)
+    first_state = AmphiState(EMPTY_HALLWAY, rooms)
     return advent_tools.bfs_min_cost_path(first_state)
 
 
