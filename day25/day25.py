@@ -16,33 +16,32 @@ def main():
     print('Part 1:', run_part_1(data))
 
 
-def run_part_1(data):
+def run_part_1(state):
     gcf = plt.gcf()
     gca = plt.gca()
     gca.set_axis_off()
     camera = Camera(gcf)
-    old_data = np.zeros_like(data.grid)
+    old_data = np.zeros_like(state.grid)
     count = 0
-    while (old_data != data.grid).any().any():
+    while (old_data != state.grid).any().any():
         count += 1
-        old_data = data.grid.copy()
-        move_one_step(data, EAST_FACING, 1)
-        move_one_step(data, SOUTH_FACING, 0)
-        data.imshow_grid()
+        old_data = state.grid.copy()
+        move_one_step(state, EAST_FACING, 1)
+        move_one_step(state, SOUTH_FACING, 0)
+        state.imshow_grid()
         camera.snap()
     animation = camera.animate()
     animation.save("animated_cucumbers.gif")
     return count
 
 
-def move_one_step(data, direction, axis):
-    east_facing = data.grid == direction
-    empty = data.grid == EMPTY
-    moved_right = np.roll(east_facing, 1, axis)
-    move_into = moved_right & empty
+def move_one_step(current_state, direction, axis):
+    facing_direction = current_state.grid == direction
+    empty = current_state.grid == EMPTY
+    move_into = np.roll(facing_direction, 1, axis) & empty
     move_from = np.roll(move_into, -1, axis)
-    data.grid[move_into] = direction
-    data.grid[move_from] = EMPTY
+    current_state.grid[move_into] = direction
+    current_state.grid[move_from] = EMPTY
 
 
 if __name__ == '__main__':
