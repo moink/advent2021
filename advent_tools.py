@@ -405,16 +405,16 @@ class PlottingGrid:
 
     def imshow_grid(self):
         """Visualize the current state of the grid"""
-        plt.clf()
+        ax = plt.gca()
         dimension = len(self.grid.shape)
         if dimension == 2:
-            plt.imshow(self.grid)
+            ax.imshow(self.grid)
         elif dimension == 3:
             self.draw_3d()
         elif dimension == 4:
             self.draw_4d()
         # Do nothing for higher dimensions
-        plt.colorbar()
+        # plt.colorbar()
 
     def draw_3d(self):
         """Draw 2D slices through the 3D grid in subplots"""
