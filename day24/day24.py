@@ -3,12 +3,12 @@ import advent_tools
 
 
 def main():
-    relations = find_relations(*(process_input(advent_tools.read_input_lines())))
+    relations = find_relations(*(get_relevant_integers(advent_tools.read_input_lines())))
     print('Part 1:', run_part_1(relations))
     print('Part 2:', run_part_2(relations))
 
 
-def process_input(data):
+def get_relevant_integers(data):
     added_to_x = []
     added_to_y = []
     divisors = []
@@ -27,26 +27,26 @@ def process_input(data):
     return added_to_x, added_to_y, divisors
 
 
-def find_relations(added_to_x, added_to_y, divisors):
-    stack = []
-    result = []
-    for i, divisor in enumerate(divisors):
-        if divisor == 1:
-            stack.append(i)
-        else:
-            prev_num = stack.pop()
-            result.append((prev_num, i, added_to_y[prev_num] + added_to_x[i]))
-    return result
+    def find_relations(added_to_x, added_to_y, divisors):
+        stack = []
+        result = []
+        for i, divisor in enumerate(divisors):
+            if divisor == 1:
+                stack.append(i)
+            else:
+                prev_num = stack.pop()
+                result.append((prev_num, i, added_to_y[prev_num] + added_to_x[i]))
+        return result
 
 
-def run_part_1(relations):
-    result = [9] * 14
-    for pos1, pos2, delta in relations:
-        if delta >= 0:
-            result[pos1] = 9 - delta
-        else:
-            result[pos2] = 9 + delta
-    return "".join(str(num) for num in result)
+    def run_part_1(relations):
+        result = [9] * 14
+        for pos1, pos2, delta in relations:
+            if delta >= 0:
+                result[pos1] = 9 - delta
+            else:
+                result[pos2] = 9 + delta
+        return "".join(str(num) for num in result)
 
 
 def run_part_2(relations):
